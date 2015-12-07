@@ -7,8 +7,8 @@ import re
 from Med.items import MedItem
 from scrapy.selector import Selector
 from scrapy.http import  Request
-from scrapy.contrib.spiders import CrawlSpider
-from scrapy.contrib.loader import ItemLoader
+from scrapy.spiders import CrawlSpider
+from scrapy.loader import ItemLoader
 from scrapy.linkextractors import LinkExtractor
 
 from bs4 import BeautifulSoup
@@ -22,7 +22,7 @@ class DiabetspiderSpider(CrawlSpider):
     )
 
     extractor = {
-    	'next_page' : LinkExtractor(allow = r'http://www.medhelp.org/forums/Diabetes---Type-2/show/46?page=\d+'),
+    	'next_page' : LinkExtractor(allow = r'http://www.medhelp.org/forums/Diabetes---Type-2/show/46(.*)'),
     	'post_page' : LinkExtractor(allow = r'http://www.medhelp.org/posts/Diabetes---Type-2/.*/show/\d+'),
     	'poster_page': LinkExtractor(allow = r'http://www.medhelp.org/personal_pages/user/\d+'),
     }

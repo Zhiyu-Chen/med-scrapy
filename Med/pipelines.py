@@ -35,9 +35,9 @@ class MedPipeline(object):
     def process_item(self, item, spider):
         if int(item['reply_num'][0]) == 0:
         	raise DropItem("no reply in %s" % item)
-        if item['post_id'] in self.ids_seen:
+        elif item['post_id'] in self.ids_seen:
         	raise DropItem("Duplicate item found: %s" % item)
-        self.ids_seen.add(item['post_id'])
-
-        self.expoter.export_item(item)
-        return item
+        else:
+            self.ids_seen.add(item['post_id'])
+            self.expoter.export_item(item)
+            return item

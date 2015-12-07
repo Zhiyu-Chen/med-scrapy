@@ -1,0 +1,3 @@
+scrapy parse -s USER_AGENT='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36'  -c parse --spider=diabetSpider 'http://www.medhelp.org/forums/Diabetes---Type-2/show/46?page=1'
+
+scrapy parse -s USER_AGENT='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36'  -c parse_poster --spider=diabetSpider --pipelines  'http://www.medhelp.org/posts/Diabetes---Type-2/Has-Victoza-helped-anyone-with-weight-loss/show/1243951'
