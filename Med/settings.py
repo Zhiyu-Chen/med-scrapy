@@ -13,9 +13,10 @@ BOT_NAME = 'Med'
 
 SPIDER_MODULES = ['Med.spiders']
 NEWSPIDER_MODULE = 'Med.spiders'
-
+DOWNLOAD_HANDLERS = {'s3': None,}
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)'
+USER_AGENT = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:42.0) Gecko/20100101 Firefox/42.0'
+#'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 CONCURRENT_REQUESTS=200

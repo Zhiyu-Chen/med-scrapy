@@ -34,6 +34,13 @@ class DiabetspiderSpider(CrawlSpider):
     	#'qa' : '//div[@class="KonaBody"]/text()[preceding-sibling::br]',
     }
 
+    new_path = {
+        'title': '//*[@id="post_question_header"]/div[2]/div[1]/text()', #title = response.xpath('//*[@id="post_question_header"]/div[2]/div[1]/text()').extract()[0].strip()
+        'reply_num':'//*[@id="post_answer_header"]/div[1]/text()', #reply_num = int(response.xpath('//*[@id="post_answer_header"]/div[1]/text()').extract()[0].strip().split(' ')[0])
+        'qa':'//div[@class="post_message_container"]/div[@class="post_message fonts_resizable"]',
+        #re.sub(r'<div(.*)none">|<div class(.*)</div>|\xa0|</div>|<br>|\t|\n|\r','',qa[0].extract()).strip()
+    }
+
     def get_userinfo(self,user_page):
         demo = []
         interest = []
@@ -67,10 +74,21 @@ class DiabetspiderSpider(CrawlSpider):
         	yield Request(url = link.url, callback = self.parse_poster)
 
     def parse_poster(self,response):
-        #judege the reply num first
-        reply_num = response.xpath(self.path['reply_num']).extract() 
-        reply_num = int(reply_num[0].split(' ')[1])
         medLoader = ItemLoader(item = MedItem(), response = response)
+        path = self.path
+        version = 0 # 0: old 1:new
+
+        #judege the reply num first
+        reply_num = response.xpath(path['reply_num']).extract() 
+        if reply_num == []:
+            version = 1
+            print "new verion!"
+            path = self.new_path
+            reply_num = response.xpath(path['reply_num']).extract() 
+            reply_num = int(reply_num[0].strip().split(' ')[0])
+        else:
+            reply_num = int(reply_num[0].strip().split(' ')[0])
+            print "old version"
 
         #fill post info
         url = str(response.url)
@@ -78,25 +96,33 @@ class DiabetspiderSpider(CrawlSpider):
         medLoader.add_value('post_id',post_id)  #is str
         medLoader.add_value('post_url',url) # is str
         medLoader.add_value('reply_num',reply_num) # is int
-        title = str(response.xpath('/html/head/title/text()').extract()[0]).strip()
+        title = str(response.xpath(path['title']).extract()[0]).strip()
         medLoader.add_value('title',title)
 
         #fill question and replies
-        allQA = response.xpath(self.path['qa']).extract()
-        question = self.getQA(allQA[0])
-        answer = []
-        for i in range(1,len(allQA)):
-            answer.append(self.getQA(allQA[i]))
-        medLoader.add_value('question',question)
-        medLoader.add_value('replies',answer)
+        allQA = response.xpath(path['qa']).extract()
+        if version == 0:
+            question = self.getQA(allQA[0])
+            answer = []
+            for i in range(1,len(allQA)):
+                answer.append(self.getQA(allQA[i]))
+            medLoader.add_value('question',question)
+            medLoader.add_value('replies',answer)
+        else:
+            question= re.sub(r'<div(.*)none">|<div class(.*)</div>|\xa0|</div>|<br>|\t|\n|\r','',allQA[0].strip())
+            answer = []
+            for i in range(1,len(allQA)):
+                answer.append(re.sub(r'<div(.*)none">|<div class(.*)</div>|\xa0|</div>|<br>|\t|\n|\r','',allQA[i].strip()))
+            medLoader.add_value('question',question)
+            medLoader.add_value('replies',answer)
 
         #fill poster info
         poster_url = self.extractor['poster_page'].extract_links(response)[0].url
         poster_id = poster_url.split('/')[-1] 
-        [demo,interest] = self.get_userinfo(poster_url)
+        #[demo,interest] = self.get_userinfo(poster_url)
         medLoader.add_value('poster_id',poster_id)
-        medLoader.add_value('poster_demo',demo)
-        medLoader.add_value('poster_interest',interest)
+        #medLoader.add_value('poster_demo',demo)
+        #medLoader.add_value('poster_interest',interest)
 
         return medLoader.load_item()
 

@@ -17,8 +17,8 @@ class MedItem(Item):
 
     #poster info
     poster_id = Field()
-    poster_demo = Field()
-    poster_interest = Field()
+    #poster_demo = Field()
+    #poster_interest = Field()
 
     #post
     question = Field()
